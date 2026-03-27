@@ -80,8 +80,8 @@ class _SidebarState extends State<Sidebar> {
     return Column(
       children: [
         Container(
-          width: MediaQuery.of(context).size.width * 0.2,
-          margin: EdgeInsets.all(20),
+          width: 290,
+          margin: EdgeInsets.all(10),
           child: ElevatedButton(
             onPressed: Provider.of<ImportedImage>(
               context,
@@ -96,26 +96,30 @@ class _SidebarState extends State<Sidebar> {
           Column(
             children: [
               // TODO: Add segmented button to alter between DIsplay mode and Edit mode
-              SegmentedButton<Modes>(
-                showSelectedIcon: false,
-                segments: const <ButtonSegment<Modes>>[
-                  ButtonSegment<Modes>(
-                    value: Modes.edit,
-                    label: Text('Edit Mode'),
-                    icon: Icon(Icons.edit),
-                  ),
-                  ButtonSegment<Modes>(
-                    value: Modes.view,
-                    label: Text('Display Mode'),
-                    icon: Icon(Icons.grid_view),
-                  ),
-                ],
-                selected: <Modes>{modes},
-                onSelectionChanged: (Set<Modes> selection) {
-                  setState(() {
-                    modes = selection.first;
-                  });
-                },
+              Container(
+                margin: EdgeInsets.all(10),
+                child: SegmentedButton<Modes>(
+                  showSelectedIcon: false,
+                  segments: const <ButtonSegment<Modes>>[
+                    ButtonSegment<Modes>(
+                      value: Modes.edit,
+                      label: Text('Edit Mode'),
+                      icon: Icon(Icons.edit),
+                    ),
+                    ButtonSegment<Modes>(
+                      value: Modes.view,
+                      label: Text('Display Mode'),
+                      icon: Icon(Icons.grid_view),
+                    ),
+                  ],
+                  selected: <Modes>{modes},
+                  onSelectionChanged: (Set<Modes> selection) {
+                    setState(() {
+                      modes = selection.first;
+                    });
+                  },
+                  direction: Axis.horizontal,
+                ),
               ),
               if (modes == Modes.view) ViewMode(),
               if (modes == Modes.edit) Text("something in edit"),
@@ -174,9 +178,13 @@ class _ViewModeState extends State<ViewMode> {
     return importedImage.originalImage != null
         ? Column(
             children: [
-              Container(child: Image.memory(importedImage.grayscaleImage!)),
+              Container(
+                child: Image.memory(importedImage.grayscaleImage!),
+                width: 280,
+              ),
+              Text("Grayscale version"),
             ],
           )
-        : Container(child: Text("Something went wrong. Try again later."));
+        : Text("Something went wrong. Try again later.");
   }
 }
