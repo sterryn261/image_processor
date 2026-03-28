@@ -16,4 +16,36 @@ class ImageManipulate {
     final encode = (await cv.imencodeAsync(".png", gray)).$2;
     return encode;
   }
+
+  Future<Uint8List> singleBGRChannel({
+    required Uint8List input,
+    required String channel,
+  }) async {
+    final image = await cv.imdecodeAsync(input, cv.IMREAD_COLOR);
+
+    int first = 0;
+    int second = 0;
+
+    if (channel == 'R') {
+      first = 0;
+      second = 1;
+    } else if (channel == 'G') {
+      first = 0;
+      second = 2;
+    } else if (channel == 'B') {
+      first = 1;
+      second = 2;
+    } else {
+      final encode = (await cv.imencodeAsync(".png", image)).$2;
+      return encode;
+    }
+
+    image.forEachPixel((row, col, pixel) {
+      pixel[first] = 0;
+      pixel[second] = 0;
+    });
+
+    final encode = (await cv.imencodeAsync(".png", image)).$2;
+    return encode;
+  }
 }
