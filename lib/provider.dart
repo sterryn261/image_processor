@@ -32,6 +32,16 @@ class ImportedImage extends ChangeNotifier {
     notifyListeners();
   }
 
+  double _temperature = 0;
+
+  double get temperature => _temperature;
+  set temperature(double value) {
+    _temperature = value;
+
+    update();
+    notifyListeners();
+  }
+
   final _pick = ImagePicker();
 
   Future<void> openPicker() async {
@@ -66,9 +76,10 @@ class ImportedImage extends ChangeNotifier {
 
   Future<void> update() async {
     _originalImage = _originalNoFilter;
-    _originalImage = await im.ImageManipulate().brightnessChange(
+    _originalImage = await im.ImageManipulate().colorCorrection(
       input: _originalImage!,
       brightness: _brightness,
+      temperature: _temperature,
     );
     _currentImage = _originalImage;
     _grayscaleImage = await im.ImageManipulate().grayscaleImage(

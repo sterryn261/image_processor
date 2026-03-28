@@ -172,6 +172,21 @@ class _EditModeState extends State<EditMode> {
             importedImage.brightness = value;
           },
         ),
+        TextButton(
+          onPressed: () {
+            importedImage.temperature = 0 * 1.0;
+          },
+          child: Text("Temperature"),
+        ),
+        Slider(
+          value: importedImage.temperature,
+          min: -20,
+          max: 20,
+          divisions: 40,
+          onChanged: (double value) {
+            importedImage.temperature = value;
+          },
+        ),
       ],
     );
   }

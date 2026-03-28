@@ -1,10 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:dartcv4/dartcv.dart' as cv;
 
-/*
-  TODO: Add cropping image features
-  TODO: Add color adjustment features
- */
 class ImageManipulate {
   Future<Uint8List> grayscaleImage({required Uint8List input}) async {
     final image = await cv.imdecodeAsync(input, cv.IMREAD_COLOR);
@@ -83,23 +79,41 @@ class ImageManipulate {
     return encode;
   }
 
-  Future<Uint8List> brightnessChange({
+  Future<Uint8List> colorCorrection({
     required Uint8List input,
     required double brightness,
+    required double temperature,
   }) async {
     final image = await cv.imdecodeAsync(input, cv.IMREAD_COLOR);
 
     final lab = await cv.cvtColorAsync(image, cv.COLOR_BGR2Lab);
     lab.forEachPixel((row, col, pixel) {
       final brightnessInt = brightness.round();
+      final temperatureInt = temperature.round();
 
       if (pixel[0] + brightnessInt < 0) {
         pixel[0] = 0;
       } else if (pixel[0] + brightnessInt > 255) {
         pixel[0] = 255;
       } else {
-        pixel[0] += brightness.round();
+        pixel[0] += brightnessInt;
       }
+
+      // if (pixel[1] + temperatureInt < 0) {
+      //   pixel[1] = 0;
+      // } else if (pixel[1] + temperatureInt > 255) {
+      //   pixel[1] = 255;
+      // } else {
+      pixel[1] += temperatureInt;
+      // }
+
+      // if (pixel[2] + temperatureInt < 0) {
+      //   pixel[2] = 0;
+      // } else if (pixel[2] + temperatureInt > 255) {
+      //   pixel[2] = 255;
+      // } else {
+      pixel[2] += temperatureInt;
+      // }
     });
 
     final output = await cv.cvtColorAsync(lab, cv.COLOR_Lab2BGR);
