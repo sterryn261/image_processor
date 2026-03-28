@@ -47,4 +47,33 @@ class ImageManipulate {
     final encode = (await cv.imencodeAsync(".png", image)).$2;
     return encode;
   }
+
+  /**
+   * 0 (false) for Clockwise, 1 (true) for CounterClockwise
+   */
+  Future<Uint8List> rotate({
+    required Uint8List input,
+    required bool direction,
+  }) async {
+    final image = await cv.imdecodeAsync(input, cv.IMREAD_COLOR);
+
+    cv.Mat rotateImage = image;
+    if (direction) {
+      rotateImage = cv.rotate(image, cv.ROTATE_90_COUNTERCLOCKWISE);
+    } else {
+      rotateImage = cv.rotate(image, cv.ROTATE_90_CLOCKWISE);
+    }
+
+    final encode = (await cv.imencodeAsync(".png", rotateImage)).$2;
+    return encode;
+  }
+
+  Future<Uint8List> flip({required Uint8List input}) async {
+    final image = await cv.imdecodeAsync(input, cv.IMREAD_COLOR);
+
+    final flipImage = cv.flip(image, 1);
+
+    final encode = (await cv.imencodeAsync(".png", flipImage)).$2;
+    return encode;
+  }
 }

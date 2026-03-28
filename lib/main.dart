@@ -31,6 +31,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class ImageValue {}
+
 class ImportedImage extends ChangeNotifier {
   Uint8List? _originalImage;
   Uint8List? _currentImage;
@@ -56,25 +58,41 @@ class ImportedImage extends ChangeNotifier {
     _originalImage = await picked.readAsBytes();
 
     await _update();
+    notifyListeners();
+  }
 
+  Future<void> _rotateImage(bool direction) async {
+    _originalImage = await im.ImageManipulate().rotate(
+      input: _originalImage!,
+      direction: direction,
+    );
+
+    await _update();
+    notifyListeners();
+  }
+
+  Future<void> _flipImage(bool direction) async {
+    _originalImage = await im.ImageManipulate().flip(input: _originalImage!);
+
+    await _update();
     notifyListeners();
   }
 
   Future<void> _update() async {
     _currentImage = _originalImage;
     _grayscaleImage = await im.ImageManipulate().grayscaleImage(
-      input: _originalImage!,
+      input: _currentImage!,
     );
     _redImage = await im.ImageManipulate().singleBGRChannel(
-      input: _originalImage!,
+      input: _currentImage!,
       channel: "R",
     );
     _blueImage = await im.ImageManipulate().singleBGRChannel(
-      input: _originalImage!,
+      input: _currentImage!,
       channel: "B",
     );
     _greenImage = await im.ImageManipulate().singleBGRChannel(
-      input: _originalImage!,
+      input: _currentImage!,
       channel: "G",
     );
   }
@@ -102,10 +120,7 @@ class _SidebarState extends State<Sidebar> {
           width: 290,
           margin: EdgeInsets.all(10),
           child: FilledButton(
-            onPressed: Provider.of<ImportedImage>(
-              context,
-              listen: false,
-            )._openPicker,
+            onPressed: importedImage._openPicker,
             child: importedImage.originalImage == null
                 ? const Text(("Add Image"))
                 : const Text("Change Image"),
@@ -137,6 +152,7 @@ class _SidebarState extends State<Sidebar> {
               direction: Axis.horizontal,
             ),
           ),
+
         SizedBox(
           width: 290,
           height: MediaQuery.of(context).size.height * 0.8,
@@ -199,6 +215,8 @@ class _ViewModeState extends State<ViewMode> {
 
     return ListView(
       children: <Widget>[
+        Image.memory(importedImage.originalImage!, width: 280),
+        ImageDescription(textContent: "Original"),
         Image.memory(importedImage.grayscaleImage!, width: 280),
         ImageDescription(textContent: "Grayscale"),
         Image.memory(importedImage.redImage!, width: 280),
@@ -237,6 +255,37 @@ class EditMode extends StatefulWidget {
 class _EditModeState extends State<EditMode> {
   @override
   Widget build(BuildContext context) {
-    return Text("placeholder");
+    final importedImage = Provider.of<ImportedImage>(context);
+
+    return ListView(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              onPressed: () {
+                importedImage._rotateImage(false);
+              },
+              icon: Icon(Icons.rotate_90_degrees_cw),
+              tooltip: "Rotate Clockwise",
+            ),
+            IconButton(
+              onPressed: () {
+                importedImage._rotateImage(true);
+              },
+              icon: Icon(Icons.rotate_90_degrees_ccw),
+              tooltip: "Rotate Counter Clockwise",
+            ),
+            IconButton(
+              onPressed: () {
+                importedImage._flipImage(true);
+              },
+              icon: Icon(Icons.flip),
+              tooltip: "Flip Image",
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }
