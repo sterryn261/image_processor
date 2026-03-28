@@ -101,7 +101,7 @@ class _SidebarState extends State<Sidebar> {
         Container(
           width: 290,
           margin: EdgeInsets.all(10),
-          child: ElevatedButton(
+          child: FilledButton(
             onPressed: Provider.of<ImportedImage>(
               context,
               listen: false,
