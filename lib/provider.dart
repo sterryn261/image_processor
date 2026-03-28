@@ -32,11 +32,21 @@ class ImportedImage extends ChangeNotifier {
     notifyListeners();
   }
 
-  double _temperature = 0;
+  double _warmth = 0;
 
-  double get temperature => _temperature;
-  set temperature(double value) {
-    _temperature = value;
+  double get warmth => _warmth;
+  set warmth(double value) {
+    _warmth = value;
+
+    update();
+    notifyListeners();
+  }
+
+  double _tint = 0;
+
+  double get tint => _tint;
+  set tint(double value) {
+    _tint = value;
 
     update();
     notifyListeners();
@@ -79,7 +89,8 @@ class ImportedImage extends ChangeNotifier {
     _originalImage = await im.ImageManipulate().colorCorrection(
       input: _originalImage!,
       brightness: _brightness,
-      temperature: _temperature,
+      warmth: _warmth,
+      tint: _tint,
     );
     _currentImage = _originalImage;
     _grayscaleImage = await im.ImageManipulate().grayscaleImage(

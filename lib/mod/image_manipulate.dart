@@ -82,14 +82,16 @@ class ImageManipulate {
   Future<Uint8List> colorCorrection({
     required Uint8List input,
     required double brightness,
-    required double temperature,
+    required double warmth,
+    required double tint,
   }) async {
     final image = await cv.imdecodeAsync(input, cv.IMREAD_COLOR);
 
     final lab = await cv.cvtColorAsync(image, cv.COLOR_BGR2Lab);
     lab.forEachPixel((row, col, pixel) {
       final brightnessInt = brightness.round();
-      final temperatureInt = temperature.round();
+      final warmthInt = warmth.round();
+      final tintInt = tint.round();
 
       if (pixel[0] + brightnessInt < 0) {
         pixel[0] = 0;
@@ -99,21 +101,37 @@ class ImageManipulate {
         pixel[0] += brightnessInt;
       }
 
-      // if (pixel[1] + temperatureInt < 0) {
-      //   pixel[1] = 0;
-      // } else if (pixel[1] + temperatureInt > 255) {
-      //   pixel[1] = 255;
-      // } else {
-      pixel[1] += temperatureInt;
-      // }
+      if (pixel[1] + warmthInt < 0) {
+        pixel[1] = 0;
+      } else if (pixel[1] + warmthInt > 255) {
+        pixel[1] = 255;
+      } else {
+        pixel[1] += warmthInt;
+      }
 
-      // if (pixel[2] + temperatureInt < 0) {
-      //   pixel[2] = 0;
-      // } else if (pixel[2] + temperatureInt > 255) {
-      //   pixel[2] = 255;
-      // } else {
-      pixel[2] += temperatureInt;
-      // }
+      if (pixel[2] + warmthInt < 0) {
+        pixel[2] = 0;
+      } else if (pixel[2] + warmthInt > 255) {
+        pixel[2] = 255;
+      } else {
+        pixel[2] += warmthInt;
+      }
+
+      if (pixel[1] + tintInt < 0) {
+        pixel[1] = 0;
+      } else if (pixel[2] + tintInt > 255) {
+        pixel[1] = 255;
+      } else {
+        pixel[1] += tintInt;
+      }
+
+      if (pixel[2] + tintInt < 0) {
+        pixel[2] = 0;
+      } else if (pixel[2] + tintInt > 255) {
+        pixel[2] = 255;
+      } else {
+        pixel[2] -= tintInt;
+      }
     });
 
     final output = await cv.cvtColorAsync(lab, cv.COLOR_Lab2BGR);

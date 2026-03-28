@@ -12,7 +12,7 @@ class Sidebar extends StatefulWidget {
 }
 
 class _SidebarState extends State<Sidebar> {
-  Modes modes = Modes.view;
+  Modes modes = Modes.edit;
 
   @override
   Widget build(BuildContext context) {
@@ -174,17 +174,32 @@ class _EditModeState extends State<EditMode> {
         ),
         TextButton(
           onPressed: () {
-            importedImage.temperature = 0 * 1.0;
+            importedImage.warmth = 0 * 1.0;
           },
-          child: Text("Temperature"),
+          child: Text("Warmth"),
         ),
         Slider(
-          value: importedImage.temperature,
+          value: importedImage.warmth,
           min: -20,
           max: 20,
           divisions: 40,
           onChanged: (double value) {
-            importedImage.temperature = value;
+            importedImage.warmth = value;
+          },
+        ),
+        TextButton(
+          onPressed: () {
+            importedImage.tint = 0 * 1.0;
+          },
+          child: Text("Tint"),
+        ),
+        Slider(
+          value: importedImage.tint,
+          min: -20,
+          max: 20,
+          divisions: 40,
+          onChanged: (double value) {
+            importedImage.tint = value;
           },
         ),
       ],
