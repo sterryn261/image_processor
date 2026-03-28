@@ -54,6 +54,13 @@ class ImportedImage extends ChangeNotifier {
       throw Exception("No Image Found");
     }
     _originalImage = await picked.readAsBytes();
+
+    await _update();
+
+    notifyListeners();
+  }
+
+  Future<void> _update() async {
     _currentImage = _originalImage;
     _grayscaleImage = await im.ImageManipulate().grayscaleImage(
       input: _originalImage!,
@@ -70,8 +77,6 @@ class ImportedImage extends ChangeNotifier {
       input: _originalImage!,
       channel: "G",
     );
-
-    notifyListeners();
   }
 }
 
@@ -132,8 +137,15 @@ class _SidebarState extends State<Sidebar> {
               direction: Axis.horizontal,
             ),
           ),
-        if (modes == Modes.view) ViewMode(),
-        if (modes == Modes.edit) Text("something in edit"),
+        SizedBox(
+          width: 290,
+          height: MediaQuery.of(context).size.height * 0.8,
+          child: importedImage.originalImage == null
+              ? Container()
+              : modes == Modes.view
+              ? ViewMode()
+              : EditMode(),
+        ),
         // TODO: Edit mode
       ],
     );
@@ -185,26 +197,18 @@ class _ViewModeState extends State<ViewMode> {
   Widget build(BuildContext context) {
     final importedImage = Provider.of<ImportedImage>(context);
 
-    return importedImage.originalImage != null
-        ? SizedBox(
-            width: 290,
-            height: MediaQuery.of(context).size.height * 0.8,
-            child: ListView(
-              // shrinkWrap: true,
-              scrollDirection: Axis.vertical,
-              children: <Widget>[
-                Image.memory(importedImage.grayscaleImage!, width: 280),
-                ImageDescription(textContent: "Grayscale"),
-                Image.memory(importedImage.redImage!, width: 280),
-                ImageDescription(textContent: "Red channel"),
-                Image.memory(importedImage.blueImage!, width: 280),
-                ImageDescription(textContent: "Blue channel"),
-                Image.memory(importedImage.greenImage!, width: 280),
-                ImageDescription(textContent: "Green channel"),
-              ],
-            ),
-          )
-        : Container();
+    return ListView(
+      children: <Widget>[
+        Image.memory(importedImage.grayscaleImage!, width: 280),
+        ImageDescription(textContent: "Grayscale"),
+        Image.memory(importedImage.redImage!, width: 280),
+        ImageDescription(textContent: "Red channel"),
+        Image.memory(importedImage.blueImage!, width: 280),
+        ImageDescription(textContent: "Blue channel"),
+        Image.memory(importedImage.greenImage!, width: 280),
+        ImageDescription(textContent: "Green channel"),
+      ],
+    );
   }
 }
 
@@ -220,5 +224,19 @@ class ImageDescription extends StatelessWidget {
         child: Text(textContent, style: TextStyle(fontWeight: FontWeight(500))),
       ),
     );
+  }
+}
+
+class EditMode extends StatefulWidget {
+  const EditMode({super.key});
+
+  @override
+  State<EditMode> createState() => _EditModeState();
+}
+
+class _EditModeState extends State<EditMode> {
+  @override
+  Widget build(BuildContext context) {
+    return Text("placeholder");
   }
 }
