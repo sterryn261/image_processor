@@ -34,19 +34,23 @@ class MyApp extends StatelessWidget {
 class ImageValue {}
 
 class ImportedImage extends ChangeNotifier {
+  Uint8List? _originalNoFilter;
   Uint8List? _originalImage;
   Uint8List? _currentImage;
   Uint8List? _grayscaleImage;
   Uint8List? _redImage;
   Uint8List? _blueImage;
   Uint8List? _greenImage;
+  Uint8List? _canny;
 
+  Uint8List? get originalNoFilter => _originalNoFilter;
   Uint8List? get originalImage => _originalImage;
   Uint8List? get currentImage => _currentImage;
   Uint8List? get grayscaleImage => _grayscaleImage;
   Uint8List? get redImage => _redImage;
   Uint8List? get blueImage => _blueImage;
   Uint8List? get greenImage => _greenImage;
+  Uint8List? get canny => _canny;
 
   final _pick = ImagePicker();
 
@@ -55,15 +59,15 @@ class ImportedImage extends ChangeNotifier {
     if (picked == null) {
       throw Exception("No Image Found");
     }
-    _originalImage = await picked.readAsBytes();
+    _originalNoFilter = await picked.readAsBytes();
 
     await _update();
     notifyListeners();
   }
 
   Future<void> _rotateImage(bool direction) async {
-    _originalImage = await im.ImageManipulate().rotate(
-      input: _originalImage!,
+    _originalNoFilter = await im.ImageManipulate().rotate(
+      input: _originalNoFilter!,
       direction: direction,
     );
 
@@ -72,13 +76,16 @@ class ImportedImage extends ChangeNotifier {
   }
 
   Future<void> _flipImage(bool direction) async {
-    _originalImage = await im.ImageManipulate().flip(input: _originalImage!);
+    _originalNoFilter = await im.ImageManipulate().flip(
+      input: _originalNoFilter!,
+    );
 
     await _update();
     notifyListeners();
   }
 
   Future<void> _update() async {
+    _originalImage = _originalNoFilter;
     _currentImage = _originalImage;
     _grayscaleImage = await im.ImageManipulate().grayscaleImage(
       input: _currentImage!,
@@ -95,6 +102,7 @@ class ImportedImage extends ChangeNotifier {
       input: _currentImage!,
       channel: "G",
     );
+    _canny = await im.ImageManipulate().edgeDetection(input: _currentImage!);
   }
 }
 
@@ -162,7 +170,6 @@ class _SidebarState extends State<Sidebar> {
               ? ViewMode()
               : EditMode(),
         ),
-        // TODO: Edit mode
       ],
     );
   }
@@ -225,6 +232,8 @@ class _ViewModeState extends State<ViewMode> {
         ImageDescription(textContent: "Blue channel"),
         Image.memory(importedImage.greenImage!, width: 280),
         ImageDescription(textContent: "Green channel"),
+        Image.memory(importedImage.canny!, width: 280),
+        ImageDescription(textContent: "Edge Detection"),
       ],
     );
   }

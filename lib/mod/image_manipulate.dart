@@ -2,7 +2,6 @@ import 'package:flutter/services.dart';
 import 'package:dartcv4/dartcv.dart' as cv;
 
 /*
-  TODO: Add rotating image features
   TODO: Add cropping image features
   TODO: Add color adjustment features
  */
@@ -45,6 +44,15 @@ class ImageManipulate {
     });
 
     final encode = (await cv.imencodeAsync(".png", image)).$2;
+    return encode;
+  }
+
+  Future<Uint8List> edgeDetection({required Uint8List input}) async {
+    final image = await cv.imdecodeAsync(input, cv.IMREAD_COLOR);
+
+    final canny = cv.canny(image, image.height / 1.0, image.width / 1.0);
+
+    final encode = (await cv.imencodeAsync(".png", canny)).$2;
     return encode;
   }
 
