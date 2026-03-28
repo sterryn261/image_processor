@@ -56,9 +56,7 @@ class ImageManipulate {
     return encode;
   }
 
-  /**
-   * 0 (false) for Clockwise, 1 (true) for CounterClockwise
-   */
+  ///0 (false) for Clockwise, 1 (true) for CounterClockwise
   Future<Uint8List> rotate({
     required Uint8List input,
     required bool direction,
