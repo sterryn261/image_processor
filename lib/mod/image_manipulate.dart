@@ -3,7 +3,6 @@ import 'package:dartcv4/dartcv.dart' as cv;
 
 /*
   TODO: Add rotating image features
-  TODO: Convert color to Red, Blue, Green and Grayscale channels
   TODO: Add cropping image features
   TODO: Add color adjustment features
  */

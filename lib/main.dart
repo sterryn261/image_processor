@@ -35,14 +35,16 @@ class ImportedImage extends ChangeNotifier {
   Uint8List? _originalImage;
   Uint8List? _currentImage;
   Uint8List? _grayscaleImage;
-  // Uint8List? _originalImage;
-  // Uint8List? _originalImage;
+  Uint8List? _redImage;
+  Uint8List? _blueImage;
+  Uint8List? _greenImage;
 
   Uint8List? get originalImage => _originalImage;
   Uint8List? get currentImage => _currentImage;
   Uint8List? get grayscaleImage => _grayscaleImage;
-  // Uint8List? get image => _originalImage;
-  // Uint8List? get image => _originalImage;
+  Uint8List? get redImage => _redImage;
+  Uint8List? get blueImage => _blueImage;
+  Uint8List? get greenImage => _greenImage;
 
   final _pick = ImagePicker();
 
@@ -55,6 +57,18 @@ class ImportedImage extends ChangeNotifier {
     _currentImage = _originalImage;
     _grayscaleImage = await im.ImageManipulate().grayscaleImage(
       input: _originalImage!,
+    );
+    _redImage = await im.ImageManipulate().singleBGRChannel(
+      input: _originalImage!,
+      channel: "R",
+    );
+    _blueImage = await im.ImageManipulate().singleBGRChannel(
+      input: _originalImage!,
+      channel: "B",
+    );
+    _greenImage = await im.ImageManipulate().singleBGRChannel(
+      input: _originalImage!,
+      channel: "G",
     );
 
     notifyListeners();
@@ -93,38 +107,34 @@ class _SidebarState extends State<Sidebar> {
           ),
         ),
         if (importedImage.originalImage != null)
-          Column(
-            children: [
-              // TODO: Add segmented button to alter between DIsplay mode and Edit mode
-              Container(
-                margin: EdgeInsets.all(10),
-                child: SegmentedButton<Modes>(
-                  showSelectedIcon: false,
-                  segments: const <ButtonSegment<Modes>>[
-                    ButtonSegment<Modes>(
-                      value: Modes.edit,
-                      label: Text('Edit Mode'),
-                      icon: Icon(Icons.edit),
-                    ),
-                    ButtonSegment<Modes>(
-                      value: Modes.view,
-                      label: Text('Display Mode'),
-                      icon: Icon(Icons.grid_view),
-                    ),
-                  ],
-                  selected: <Modes>{modes},
-                  onSelectionChanged: (Set<Modes> selection) {
-                    setState(() {
-                      modes = selection.first;
-                    });
-                  },
-                  direction: Axis.horizontal,
+          Container(
+            margin: EdgeInsets.all(10),
+            child: SegmentedButton<Modes>(
+              showSelectedIcon: false,
+              segments: const <ButtonSegment<Modes>>[
+                ButtonSegment<Modes>(
+                  value: Modes.edit,
+                  label: Text('Edit Mode'),
+                  icon: Icon(Icons.edit),
                 ),
-              ),
-              if (modes == Modes.view) ViewMode(),
-              if (modes == Modes.edit) Text("something in edit"),
-            ],
+                ButtonSegment<Modes>(
+                  value: Modes.view,
+                  label: Text('Display Mode'),
+                  icon: Icon(Icons.grid_view),
+                ),
+              ],
+              selected: <Modes>{modes},
+              onSelectionChanged: (Set<Modes> selection) {
+                setState(() {
+                  modes = selection.first;
+                });
+              },
+              direction: Axis.horizontal,
+            ),
           ),
+        if (modes == Modes.view) ViewMode(),
+        if (modes == Modes.edit) Text("something in edit"),
+        // TODO: Edit mode
       ],
     );
   }
@@ -176,15 +186,39 @@ class _ViewModeState extends State<ViewMode> {
     final importedImage = Provider.of<ImportedImage>(context);
 
     return importedImage.originalImage != null
-        ? Column(
-            children: [
-              Container(
-                child: Image.memory(importedImage.grayscaleImage!),
-                width: 280,
-              ),
-              Text("Grayscale version"),
-            ],
+        ? SizedBox(
+            width: 290,
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: ListView(
+              // shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              children: <Widget>[
+                Image.memory(importedImage.grayscaleImage!, width: 280),
+                ImageDescription(textContent: "Grayscale"),
+                Image.memory(importedImage.redImage!, width: 280),
+                ImageDescription(textContent: "Red channel"),
+                Image.memory(importedImage.blueImage!, width: 280),
+                ImageDescription(textContent: "Blue channel"),
+                Image.memory(importedImage.greenImage!, width: 280),
+                ImageDescription(textContent: "Green channel"),
+              ],
+            ),
           )
-        : Text("Something went wrong. Try again later.");
+        : Container();
+  }
+}
+
+class ImageDescription extends StatelessWidget {
+  const ImageDescription({super.key, required this.textContent});
+  final String textContent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(top: 5, bottom: 10),
+      child: Center(
+        child: Text(textContent, style: TextStyle(fontWeight: FontWeight(500))),
+      ),
+    );
   }
 }
