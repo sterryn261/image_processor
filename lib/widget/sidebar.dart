@@ -157,6 +157,21 @@ class _EditModeState extends State<EditMode> {
             ),
           ],
         ),
+        TextButton(
+          onPressed: () {
+            importedImage.brightness = 0 * 1.0;
+          },
+          child: Text("Brightness"),
+        ),
+        Slider(
+          value: importedImage.brightness,
+          min: -100,
+          max: 100,
+          divisions: 200,
+          onChanged: (double value) {
+            importedImage.brightness = value;
+          },
+        ),
       ],
     );
   }

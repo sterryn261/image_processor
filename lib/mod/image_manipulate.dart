@@ -82,4 +82,29 @@ class ImageManipulate {
     final encode = (await cv.imencodeAsync(".png", flipImage)).$2;
     return encode;
   }
+
+  Future<Uint8List> brightnessChange({
+    required Uint8List input,
+    required double brightness,
+  }) async {
+    final image = await cv.imdecodeAsync(input, cv.IMREAD_COLOR);
+
+    final lab = await cv.cvtColorAsync(image, cv.COLOR_BGR2Lab);
+    lab.forEachPixel((row, col, pixel) {
+      final brightnessInt = brightness.round();
+
+      if (pixel[0] + brightnessInt < 0) {
+        pixel[0] = 0;
+      } else if (pixel[0] + brightnessInt > 255) {
+        pixel[0] = 255;
+      } else {
+        pixel[0] += brightness.round();
+      }
+    });
+
+    final output = await cv.cvtColorAsync(lab, cv.COLOR_Lab2BGR);
+
+    final encode = (await cv.imencodeAsync(".png", output)).$2;
+    return encode;
+  }
 }

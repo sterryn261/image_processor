@@ -22,6 +22,16 @@ class ImportedImage extends ChangeNotifier {
   Uint8List? get greenImage => _greenImage;
   Uint8List? get canny => _canny;
 
+  double _brightness = 0;
+
+  double get brightness => _brightness;
+  set brightness(double value) {
+    _brightness = value;
+
+    update();
+    notifyListeners();
+  }
+
   final _pick = ImagePicker();
 
   Future<void> openPicker() async {
@@ -56,6 +66,10 @@ class ImportedImage extends ChangeNotifier {
 
   Future<void> update() async {
     _originalImage = _originalNoFilter;
+    _originalImage = await im.ImageManipulate().brightnessChange(
+      input: _originalImage!,
+      brightness: _brightness,
+    );
     _currentImage = _originalImage;
     _grayscaleImage = await im.ImageManipulate().grayscaleImage(
       input: _currentImage!,
