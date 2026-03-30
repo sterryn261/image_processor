@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import './mod/debounce.dart';
 import './mod/image_manipulate.dart' as im;
 
 class ImportedImage extends ChangeNotifier {
@@ -29,9 +30,10 @@ class ImportedImage extends ChangeNotifier {
   double get brightness => _brightness;
   set brightness(double value) {
     _brightness = value;
-
-    update();
+    Debounce().run(() async {
+      await update();
     notifyListeners();
+    });
   }
 
   double _warmth = 0;
@@ -40,8 +42,10 @@ class ImportedImage extends ChangeNotifier {
   set warmth(double value) {
     _warmth = value;
 
-    update();
+    Debounce().run(() async {
+      await update();
     notifyListeners();
+    });
   }
 
   double _tint = 0;
@@ -50,8 +54,10 @@ class ImportedImage extends ChangeNotifier {
   set tint(double value) {
     _tint = value;
 
-    update();
+    Debounce().run(() async {
+      await update();
     notifyListeners();
+    });
   }
 
   double _alpha = 0;
