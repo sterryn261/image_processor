@@ -85,10 +85,17 @@ class ImageManipulate {
     required double brightness,
     required double warmth,
     required double tint,
+    required double alpha,
+    required double beta,
   }) async {
     final image = await cv.imdecodeAsync(input, cv.IMREAD_COLOR);
 
-    final lab = await cv.cvtColorAsync(image, cv.COLOR_BGR2Lab);
+    final contrast = await cv.convertScaleAbsAsync(
+      image,
+      alpha: alpha,
+      beta: beta,
+    );
+    final lab = await cv.cvtColorAsync(contrast, cv.COLOR_BGR2Lab);
     lab.forEachPixel((row, col, pixel) {
       final brightnessInt = brightness.round();
       final warmthInt = warmth.round();

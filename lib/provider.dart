@@ -32,7 +32,7 @@ class ImportedImage extends ChangeNotifier {
     _brightness = value;
     Debounce().run(() async {
       await update();
-    notifyListeners();
+      notifyListeners();
     });
   }
 
@@ -44,7 +44,7 @@ class ImportedImage extends ChangeNotifier {
 
     Debounce().run(() async {
       await update();
-    notifyListeners();
+      notifyListeners();
     });
   }
 
@@ -56,18 +56,32 @@ class ImportedImage extends ChangeNotifier {
 
     Debounce().run(() async {
       await update();
-    notifyListeners();
+      notifyListeners();
     });
   }
 
-  double _alpha = 0;
+  double _alpha = 1;
 
   double get alpha => _alpha;
   set alpha(double value) {
     _alpha = value;
 
-    update();
-    notifyListeners();
+    Debounce().run(() async {
+      await update();
+      notifyListeners();
+    });
+  }
+
+  double _beta = 0;
+
+  double get beta => _beta;
+  set beta(double value) {
+    _beta = value;
+
+    Debounce().run(() async {
+      await update();
+      notifyListeners();
+    });
   }
 
   final _pick = ImagePicker();
@@ -109,6 +123,8 @@ class ImportedImage extends ChangeNotifier {
       brightness: _brightness,
       warmth: _warmth,
       tint: _tint,
+      alpha: _alpha,
+      beta: _beta,
     );
     _currentImage = _originalImage;
     _grayscaleImage = await im.ImageManipulate().grayscaleImage(
