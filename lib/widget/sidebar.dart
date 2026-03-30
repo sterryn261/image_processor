@@ -59,7 +59,7 @@ class _SidebarState extends State<Sidebar> {
 
         SizedBox(
           width: 290,
-          height: MediaQuery.of(context).size.height * 0.8,
+          height: MediaQuery.of(context).size.height * 0.7,
           child: importedImage.originalImage == null
               ? Container()
               : modes == Modes.view
@@ -74,7 +74,7 @@ class _SidebarState extends State<Sidebar> {
               onPressed: importedImage.saveImage,
               child: const Text(("Save Image")),
             ),
-        ),
+          ),
       ],
     );
   }
