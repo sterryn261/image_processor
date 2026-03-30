@@ -213,6 +213,21 @@ class _EditModeState extends State<EditMode> {
         ),
         TextButton(
           onPressed: () {
+            importedImage.gamma = 1 * 1.0;
+          },
+          child: Text("Gamma"),
+        ),
+        Slider(
+          value: importedImage.gamma,
+          min: 0.2,
+          max: 1.8,
+          divisions: 40,
+          onChanged: (double value) {
+            importedImage.gamma = value;
+          },
+        ),
+        TextButton(
+          onPressed: () {
             importedImage.warmth = 0 * 1.0;
           },
           child: Text("Warmth"),
@@ -226,6 +241,7 @@ class _EditModeState extends State<EditMode> {
             importedImage.warmth = value;
           },
         ),
+
         TextButton(
           onPressed: () {
             importedImage.tint = 0 * 1.0;

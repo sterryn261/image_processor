@@ -84,6 +84,18 @@ class ImportedImage extends ChangeNotifier {
     });
   }
 
+  double _gamma = 1;
+
+  double get gamma => _gamma;
+  set gamma(double value) {
+    _gamma = value;
+
+    Debounce().run(() async {
+      await update();
+      notifyListeners();
+    });
+  }
+
   final _pick = ImagePicker();
 
   Future<void> openPicker() async {
@@ -125,6 +137,7 @@ class ImportedImage extends ChangeNotifier {
       tint: _tint,
       alpha: _alpha,
       beta: _beta,
+      gamma: _gamma,
     );
     _currentImage = _originalImage;
     _grayscaleImage = await im.ImageManipulate().grayscaleImage(

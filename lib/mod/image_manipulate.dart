@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/services.dart';
 // ignore: depend_on_referenced_packages
 import 'package:dartcv4/dartcv.dart' as cv;
@@ -80,6 +81,84 @@ class ImageManipulate {
     return encode;
   }
 
+  Future<cv.Mat> linearTransform({
+    required cv.Mat input,
+    required double alpha,
+    required double beta,
+  }) async {
+    final contrast = await cv.convertScaleAbsAsync(
+      input,
+      alpha: alpha,
+      beta: beta,
+    );
+    return contrast;
+  }
+
+  Future<cv.Mat> labTransform({
+    required cv.Mat input,
+    required double brightness,
+    required double warmth,
+    required double tint,
+  }) async {
+    final lab = await cv.cvtColorAsync(input, cv.COLOR_BGR2Lab);
+    lab.forEachPixel((row, col, pixel) {
+      final brightnessInt = brightness.round();
+      final warmthInt = warmth.round();
+      final tintInt = tint.round();
+
+      pixel[0] = (pixel[0] + brightnessInt < 0)
+          ? 0
+          : (pixel[0] + brightnessInt > 255)
+          ? 255
+          : (pixel[0] + brightnessInt);
+
+      pixel[1] = (pixel[1] + warmthInt < 0)
+          ? 0
+          : (pixel[1] + warmthInt > 255)
+          ? 255
+          : (pixel[1] + warmthInt);
+
+      pixel[2] = (pixel[2] + warmthInt < 0)
+          ? 0
+          : (pixel[2] + warmthInt > 255)
+          ? 255
+          : (pixel[2] + warmthInt);
+
+      pixel[1] = (pixel[1] + tintInt < 0)
+          ? 0
+          : (pixel[1] + tintInt > 255)
+          ? 255
+          : (pixel[1] + tintInt);
+
+      pixel[2] = (pixel[2] + tintInt < 0)
+          ? 0
+          : (pixel[2] + tintInt > 255)
+          ? 255
+          : (pixel[2] - tintInt);
+    });
+    final output = await cv.cvtColorAsync(lab, cv.COLOR_Lab2BGR);
+    return output;
+  }
+
+  Uint8List lookUpTable(double gamma) {
+    final lut = Uint8List(256);
+    for (int i = 0; i < 256; i++) {
+      final correction = pow((i / 255.0), (1.0 / gamma)) * 255.0;
+      lut[i] = correction.round().clamp(0, 255);
+    }
+    return lut;
+  }
+
+  cv.Mat gammaTransform({required cv.Mat input, required double gamma}) {
+    final lut = lookUpTable(gamma);
+    input.forEachPixel((row, col, pixel) {
+      pixel[0] = lut[pixel[0].toInt()];
+      pixel[1] = lut[pixel[1].toInt()];
+      pixel[2] = lut[pixel[2].toInt()];
+    });
+    return input;
+  }
+
   Future<Uint8List> colorCorrection({
     required Uint8List input,
     required double brightness,
@@ -87,64 +166,20 @@ class ImageManipulate {
     required double tint,
     required double alpha,
     required double beta,
+    required double gamma,
   }) async {
-    final image = await cv.imdecodeAsync(input, cv.IMREAD_COLOR);
+    cv.Mat image = await cv.imdecodeAsync(input, cv.IMREAD_COLOR);
 
-    final contrast = await cv.convertScaleAbsAsync(
-      image,
-      alpha: alpha,
-      beta: beta,
+    image = await linearTransform(input: image, alpha: alpha, beta: beta);
+    image = await labTransform(
+      input: image,
+      brightness: brightness,
+      warmth: warmth,
+      tint: tint,
     );
-    final lab = await cv.cvtColorAsync(contrast, cv.COLOR_BGR2Lab);
-    lab.forEachPixel((row, col, pixel) {
-      final brightnessInt = brightness.round();
-      final warmthInt = warmth.round();
-      final tintInt = tint.round();
+    image = gammaTransform(input: image, gamma: gamma);
 
-      if (pixel[0] + brightnessInt < 0) {
-        pixel[0] = 0;
-      } else if (pixel[0] + brightnessInt > 255) {
-        pixel[0] = 255;
-      } else {
-        pixel[0] += brightnessInt;
-      }
-
-      if (pixel[1] + warmthInt < 0) {
-        pixel[1] = 0;
-      } else if (pixel[1] + warmthInt > 255) {
-        pixel[1] = 255;
-      } else {
-        pixel[1] += warmthInt;
-      }
-
-      if (pixel[2] + warmthInt < 0) {
-        pixel[2] = 0;
-      } else if (pixel[2] + warmthInt > 255) {
-        pixel[2] = 255;
-      } else {
-        pixel[2] += warmthInt;
-      }
-
-      if (pixel[1] + tintInt < 0) {
-        pixel[1] = 0;
-      } else if (pixel[2] + tintInt > 255) {
-        pixel[1] = 255;
-      } else {
-        pixel[1] += tintInt;
-      }
-
-      if (pixel[2] + tintInt < 0) {
-        pixel[2] = 0;
-      } else if (pixel[2] + tintInt > 255) {
-        pixel[2] = 255;
-      } else {
-        pixel[2] -= tintInt;
-      }
-    });
-
-    final output = await cv.cvtColorAsync(lab, cv.COLOR_Lab2BGR);
-
-    final encode = (await cv.imencodeAsync(".png", output)).$2;
+    final encode = (await cv.imencodeAsync(".png", image)).$2;
     return encode;
   }
 }
