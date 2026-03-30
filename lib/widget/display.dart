@@ -21,10 +21,15 @@ class _DisplayImgState extends State<DisplayImg> {
         height: MediaQuery.of(context).size.height * 0.9,
 
         child: importedImage.originalImage != null
-            ? Image.memory(
-                importedImage.currentImage!,
-                height: double.infinity,
-                width: double.infinity,
+            ? InteractiveViewer(
+                boundaryMargin: const EdgeInsets.all(20.0),
+                minScale: 1,
+                maxScale: 6,
+                child: Image.memory(
+                  importedImage.currentImage!,
+                  height: double.infinity,
+                  width: double.infinity,
+                ),
               )
             : Text(
                 "Add an image here...",
