@@ -141,7 +141,10 @@ class ImportedImage extends ChangeNotifier {
   }
 
   Future<void> update() async {
-    _originalImage = _originalNoFilter;
+    _originalImage = await im.ImageManipulate().reduceResolution(
+      input: _originalNoFilter!,
+    );
+
     _originalImage = await im.ImageManipulate().colorCorrection(
       input: _originalImage!,
       brightness: _brightness,
@@ -176,6 +179,17 @@ class ImportedImage extends ChangeNotifier {
     final File file = File(
       "$path/image_${DateTime.now().millisecondsSinceEpoch}.png",
     );
-    await file.writeAsBytes(_originalImage!);
+
+    final output = await im.ImageManipulate().colorCorrection(
+      input: _originalNoFilter!,
+      brightness: _brightness,
+      warmth: _warmth,
+      tint: _tint,
+      alpha: _alpha,
+      beta: _beta,
+      gamma: _gamma,
+      chroma: _chroma,
+    );
+    await file.writeAsBytes(output);
   }
 }

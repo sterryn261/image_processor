@@ -206,4 +206,12 @@ class ImageManipulate {
     final encode = (await cv.imencodeAsync(".png", image)).$2;
     return encode;
   }
+
+  Future<Uint8List> reduceResolution({required Uint8List input}) async {
+    cv.Mat image = await cv.imdecodeAsync(input, cv.IMREAD_COLOR);
+    image = cv.pyrDown(image);
+
+    final encode = (await cv.imencodeAsync(".png", image)).$2;
+    return encode;
+  }
 }

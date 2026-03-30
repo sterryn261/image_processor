@@ -27,7 +27,7 @@ class _DisplayImgState extends State<DisplayImg> {
                 width: double.infinity,
               )
             : Text(
-                "Add or drop an image here",
+                "Add an image here...",
                 style: TextStyle(fontWeight: FontWeight(500)),
               ),
       ),
