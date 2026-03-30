@@ -140,7 +140,7 @@ class ImageManipulate {
     return output;
   }
 
-  Uint8List lookUpTable(double gamma) {
+  Future<Uint8List> lookUpTable(double gamma) async {
     final lut = Uint8List(256);
     for (int i = 0; i < 256; i++) {
       final correction = pow((i / 255.0), (1.0 / gamma)) * 255.0;
@@ -149,14 +149,36 @@ class ImageManipulate {
     return lut;
   }
 
-  cv.Mat gammaTransform({required cv.Mat input, required double gamma}) {
-    final lut = lookUpTable(gamma);
+  Future<cv.Mat> gammaTransform({
+    required cv.Mat input,
+    required double gamma,
+  }) async {
+    final lut = await lookUpTable(gamma);
     input.forEachPixel((row, col, pixel) {
       pixel[0] = lut[pixel[0].toInt()];
       pixel[1] = lut[pixel[1].toInt()];
       pixel[2] = lut[pixel[2].toInt()];
     });
     return input;
+  }
+
+  Future<cv.Mat> chromaTransform({
+    required cv.Mat input,
+    required double chroma,
+  }) async {
+    final ycrcb = await cv.cvtColorAsync(input, cv.COLOR_BGR2HSV);
+
+    final chromaInt = chroma.toInt();
+    ycrcb.forEachPixel((row, col, pixel) {
+      pixel[1] = (pixel[1] + chromaInt < 0)
+          ? 0
+          : (pixel[1] + chromaInt > 255)
+          ? 255
+          : (pixel[1] + chromaInt);
+    });
+    final output = await cv.cvtColorAsync(ycrcb, cv.COLOR_HSV2BGR);
+
+    return output;
   }
 
   Future<Uint8List> colorCorrection({
@@ -167,6 +189,7 @@ class ImageManipulate {
     required double alpha,
     required double beta,
     required double gamma,
+    required double chroma,
   }) async {
     cv.Mat image = await cv.imdecodeAsync(input, cv.IMREAD_COLOR);
 
@@ -177,7 +200,8 @@ class ImageManipulate {
       warmth: warmth,
       tint: tint,
     );
-    image = gammaTransform(input: image, gamma: gamma);
+    image = await gammaTransform(input: image, gamma: gamma);
+    image = await chromaTransform(input: image, chroma: chroma);
 
     final encode = (await cv.imencodeAsync(".png", image)).$2;
     return encode;

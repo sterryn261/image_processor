@@ -228,6 +228,22 @@ class _EditModeState extends State<EditMode> {
         ),
         TextButton(
           onPressed: () {
+            importedImage.chroma = 0 * 1.0;
+          },
+          child: Text("Chroma"),
+        ),
+        Slider(
+          value: importedImage.chroma,
+          min: -255,
+          max: 255,
+          divisions: 100,
+          onChanged: (double value) {
+            importedImage.chroma = value;
+          },
+        ),
+
+        TextButton(
+          onPressed: () {
             importedImage.warmth = 0 * 1.0;
           },
           child: Text("Warmth"),
