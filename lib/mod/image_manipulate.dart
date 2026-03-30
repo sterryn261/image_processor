@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+// ignore: depend_on_referenced_packages
 import 'package:dartcv4/dartcv.dart' as cv;
 
 class ImageManipulate {

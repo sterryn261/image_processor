@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import './mod/image_manipulate.dart' as im;
 
 class ImportedImage extends ChangeNotifier {
@@ -47,6 +49,16 @@ class ImportedImage extends ChangeNotifier {
   double get tint => _tint;
   set tint(double value) {
     _tint = value;
+
+    update();
+    notifyListeners();
+  }
+
+  double _alpha = 0;
+
+  double get alpha => _alpha;
+  set alpha(double value) {
+    _alpha = value;
 
     update();
     notifyListeners();
@@ -109,5 +121,13 @@ class ImportedImage extends ChangeNotifier {
       channel: "G",
     );
     _canny = await im.ImageManipulate().edgeDetection(input: _currentImage!);
+  }
+
+  Future<void> saveImage() async {
+    final path = (await getApplicationDocumentsDirectory()).path;
+    final File file = File(
+      "$path/image_${DateTime.now().millisecondsSinceEpoch}.png",
+    );
+    await file.writeAsBytes(_originalImage!);
   }
 }

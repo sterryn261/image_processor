@@ -66,6 +66,15 @@ class _SidebarState extends State<Sidebar> {
               ? ViewMode()
               : EditMode(),
         ),
+        if (importedImage.originalImage != null)
+          Container(
+            width: 290,
+            margin: EdgeInsets.all(10),
+            child: FilledButton(
+              onPressed: importedImage.saveImage,
+              child: const Text(("Save Image")),
+            ),
+        ),
       ],
     );
   }
