@@ -209,7 +209,9 @@ class ImageManipulate {
 
   Future<Uint8List> reduceResolution({required Uint8List input}) async {
     cv.Mat image = await cv.imdecodeAsync(input, cv.IMREAD_COLOR);
-    image = cv.pyrDown(image);
+    if (image.cols * image.rows > 1000000) {
+      image = cv.pyrDown(image);
+    }
 
     final encode = (await cv.imencodeAsync(".png", image)).$2;
     return encode;
