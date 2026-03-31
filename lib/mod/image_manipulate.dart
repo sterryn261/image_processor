@@ -247,6 +247,7 @@ class ImageManipulate {
     return encode;
   }
 
+  /// Giảm chất lượng ảnh nếu kích cỡ ảnh vượt quá 1 triệu điểm ảnh
   Future<Uint8List> reduceResolution({required Uint8List input}) async {
     cv.Mat image = await cv.imdecodeAsync(input, cv.IMREAD_COLOR);
     if (image.cols * image.rows > 1000000) {
